@@ -51,7 +51,7 @@ async function sendMessage(recipientPhone, senderPhone, message) {
     }).catch(err => console.log(err));
 }
 
-TWILIO_TOKEN
+
 async function getData() {
     return fetch(`https://api.apispreadsheets.com/data/${process.env.FILE_ID}/`).then(res => {
         if (res.status === 200) {
@@ -72,10 +72,10 @@ export const handler = async () => {
     const data = await getData();
     const today = new Date();
     const filteredData = data.filter(sched => new Date(sched.date) > today);
-    // console.log('filteredData: ', filteredData);
-
     const nextSunday = filteredData[0];
+
     console.log('nextSunday: ', nextSunday);
+
     if (!nextSunday) {
         process.exit();
     }
