@@ -13,19 +13,19 @@ const token = process.env.TWILIO_TOKEN;
 const tanner = {
     firstName: 'Tanner',
     lastName: 'Plauché',
-    phone: '7202221037'
+    phone: process.env.TANNER_PHONE
 }
 
 const tyler = {
     firstName: 'Tanner',
     lastName: 'Plauché',
-    phone: '7202221037'
+    phone: process.env.TYLER_PHONE
 }
 
 const twilioAccount = {
     firstName: 'Tanner',
     lastName: 'Plauché',
-    phone: '13608032968'
+    phone: process.env.TWILIO_PHONE
 }
 
 const twilio = new Twilio(accountSid, token);
