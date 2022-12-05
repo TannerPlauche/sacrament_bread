@@ -1,0 +1,19 @@
+{
+  "name": "breadschedule",
+  "version": "1.0.0",
+  "description": "A simple chron job to send reminders about the sacrament bread",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "zip": "zip -r ../breadschedule.zip *"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "lodash": "^4.17.21",
+    "node-fetch": "^3.3.0",
+    "twilio": "^3.83.4"
+  },
+  "type": "module"
+}
