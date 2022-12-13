@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 import Twilio from 'twilio';
+
 dotenv.config();
 
 // data here
@@ -32,23 +33,22 @@ const twilio = new Twilio(accountSid, token);
 
 /**
  * send message via twilio
- * @param {string} recipientPhone 
- * @param {string} senderPhone 
- * @param {string} message 
+ * @param {string} recipientPhone
+ * @param {string} senderPhone
+ * @param {string} message
  */
 async function sendMessage(recipientPhone, senderPhone, message) {
-
     console.log(`sending message to ${recipientPhone} from ${senderPhone}`);
-    const promise = twilio.messages.create({
-        from: recipientPhone,
-        to: senderPhone,
+    return twilio.messages.create({
+        from: senderPhone,
+        to: recipientPhone,
         body: message
-    });
-
-    promise.then(function (message) {
-        console.log('Created message using promises');
+    }).then(function (message) {
+        console.log(`Message successfully sent to ${recipientPhone}`);
         console.log(message.sid);
-    }).catch(err => console.log(err));
+    }).catch(err => {
+        console.log(`Failed to send message ${JSON.stringify(err)}`)
+    });
 }
 
 
@@ -60,8 +60,7 @@ async function getData() {
                 const yourData = data.data;
                 return yourData;
             }).catch(err => console.log(err))
-        }
-        else {
+        } else {
             console.log(`err: ${err}`);
         }
     });
@@ -72,16 +71,16 @@ export const handler = async () => {
     const data = await getData();
     const today = new Date();
     const filteredData = data.filter(sched => new Date(sched.date) > today);
+    // console.log('filteredData: ', filteredData);
+
     const nextSunday = filteredData[0];
-
     console.log('nextSunday: ', nextSunday);
-
     if (!nextSunday) {
         process.exit();
     }
 
     const message = `Hi ${nextSunday.firstName}, you are scheduled to bring the bread for sacrament this Sunday, ${nextSunday.date}. If you are not able to do this please
-let Brother Plauché (${tanner.phone}) or Brother Nelson (${tyler.phone}) know. \n\n\nyou will receive this message Friday, Saturday, and Sunday the week leading up to ${nextSunday.date}`
+let Brother Plauché (${tanner.phone}) or Brother Nelson (${tyler.phone}) know. \n\n\nYou will receive this message Wednesday, Saturday, and Sunday the week leading up to ${nextSunday.date}`
 
     console.log('message: ', message);
 
@@ -104,5 +103,3 @@ let Brother Plauché (${tanner.phone}) or Brother Nelson (${tyler.phone}) know. 
     );
 
 }
-
-
