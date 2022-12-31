@@ -66,11 +66,24 @@ async function getData() {
     });
 }
 
+function isToday(date) {
+    const today = new Date();
+
+    // 👇️ Today's date
+    console.log(today);
+
+    if (today.toDateString() === date.toDateString()) {
+        return true;
+    }
+
+    return false;
+}
+
 export const handler = async () => {
 
     const data = await getData();
     const today = new Date();
-    const filteredData = data.filter(sched => new Date(sched.date) > today);
+    const filteredData = data.filter(sched => new Date(sched.date) > today || isToday(new Date(sched.date)));
     // console.log('filteredData: ', filteredData);
 
     const nextSunday = filteredData[0];
