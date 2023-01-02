@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
-import fetch from 'node-fetch';
+// import fetch from 'node-fetch';
 import Twilio from 'twilio';
+import DataService from './dataService.js';
 
 dotenv.config();
 
@@ -51,19 +52,20 @@ async function sendMessage(recipientPhone, senderPhone, message) {
     });
 }
 
-
 async function getData() {
-    return fetch(`https://api.apispreadsheets.com/data/${process.env.FILE_ID}/`).then(res => {
-        if (res.status === 200) {
-            console.log('success');
-            return res.json().then(data => {
-                const yourData = data.data;
-                return yourData;
-            }).catch(err => console.log(err))
-        } else {
-            console.log(`err: ${err}`);
-        }
-    });
+    // return fetch(`https://api.apispreadsheets.com/data/${process.env.FILE_ID}/`).then(res => {
+    //     if (res.status === 200) {
+    //         console.log('success');
+    //         return res.json().then(data => {
+    //             console.log('data: ', data);
+    //             const yourData = data.data;
+    //             return yourData;
+    //         }).catch(err => console.log(err))
+    //     } else {
+    //         console.log(`err: ${err}`);
+    //     }
+    // });
+    return await DataService.fetchSchedule();
 }
 
 function isToday(date) {
@@ -92,16 +94,18 @@ export const handler = async () => {
         process.exit();
     }
 
-    const message = `Hi ${nextSunday.firstName}, you are scheduled to bring the bread for sacrament this Sunday, ${nextSunday.date}. If you are not able to do this please
-let Brother Plauché (${tanner.phone}) or Brother Nelson (${tyler.phone}) know. \n\n\nYou will receive this message Wednesday, Saturday, and Sunday the week leading up to ${nextSunday.date}`
+    const message = `Hi ${nextSunday.firstName || 'NO ONE IS SCHEDULED'}, you are scheduled to bring the bread for sacrament this Sunday, ${nextSunday.date}. If you are not able to do this please
+    let Brother Plauché (${tanner.phone}) or Brother Nelson (${tyler.phone}) know. \n\n\nYou will receive this message Wednesday, Saturday, and Sunday the week leading up to ${nextSunday.date}`
 
     console.log('message: ', message);
 
-    await sendMessage(
-        nextSunday.phone,
-        twilioAccount.phone,
-        message
-    );
+    if (nextSunday.phone) {
+        await sendMessage(
+            nextSunday.phone,
+            twilioAccount.phone,
+            message
+        );
+    }
 
     await sendMessage(
         tanner.phone,
@@ -115,4 +119,18 @@ let Brother Plauché (${tanner.phone}) or Brother Nelson (${tyler.phone}) know. 
         message
     );
 
+    if (nextSunday.parentPhone && nextSunday.parentFirstName) {
+        const parentMessage = `Hi ${nextSunday.parentFirstName}, ${nextSunday.firstName} is scheduled to bring the bread for sacrament this Sunday, ${nextSunday.date}. If ${nextSunday.firstName} is not able to do this please
+        let Brother Plauché (${tanner.phone}) or Brother Nelson (${tyler.phone}) know. \n\n\nYou will receive this message Wednesday, Saturday, and Sunday the week leading up to ${nextSunday.date}`
+        console.log('parentMessage: ', parentMessage);
+
+        await sendMessage(
+            nextSunday.parentPhone,
+            twilioAccount.phone,
+            parentMessage
+        );
+    }
+
 }
+
+handler();
