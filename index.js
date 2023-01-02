@@ -39,32 +39,32 @@ const twilio = new Twilio(accountSid, token);
  * @param {string} message
  */
 async function sendMessage(recipientPhone, senderPhone, message) {
-    console.log(`sending message to ${recipientPhone} from ${senderPhone}`);
-    return twilio.messages.create({
-        from: senderPhone,
-        to: recipientPhone,
-        body: message
-    }).then(function (message) {
-        console.log(`Message successfully sent to ${recipientPhone}`);
-        console.log(message.sid);
-    }).catch(err => {
-        console.log(`Failed to send message ${JSON.stringify(err)}`)
-    });
+    // console.log(`sending message to ${recipientPhone} from ${senderPhone}`);
+    // return twilio.messages.create({
+    //     from: senderPhone,
+    //     to: recipientPhone,
+    //     body: message
+    // }).then(function (message) {
+    //     console.log(`Message successfully sent to ${recipientPhone}`);
+    //     console.log(message.sid);
+    // }).catch(err => {
+    //     console.log(`Failed to send message ${JSON.stringify(err)}`)
+    // });
 }
 
 async function getData() {
-    // return fetch(`https://api.apispreadsheets.com/data/${process.env.FILE_ID}/`).then(res => {
-    //     if (res.status === 200) {
-    //         console.log('success');
-    //         return res.json().then(data => {
-    //             console.log('data: ', data);
-    //             const yourData = data.data;
-    //             return yourData;
-    //         }).catch(err => console.log(err))
-    //     } else {
-    //         console.log(`err: ${err}`);
-    //     }
-    // });
+    return fetch(`https://api.apispreadsheets.com/data/${process.env.FILE_ID}/`).then(res => {
+        if (res.status === 200) {
+            console.log('success');
+            return res.json().then(data => {
+                console.log('data: ', data);
+                const yourData = data.data;
+                return yourData;
+            }).catch(err => console.log(err))
+        } else {
+            console.log(`err: ${err}`);
+        }
+    });
     return await DataService.fetchSchedule();
 }
 
@@ -85,7 +85,10 @@ export const handler = async () => {
 
     const data = await getData();
     const today = new Date();
-    const filteredData = data.filter(sched => new Date(sched.date) > today || isToday(new Date(sched.date)));
+    const filteredData = data
+        .filter(sched => new Date(sched.date) > today || isToday(new Date(sched.date)))
+        .sort((weeka, weekb) => new Date(weeka.date) - new Date(weekb.date));
+
     // console.log('filteredData: ', filteredData);
 
     const nextSunday = filteredData[0];
@@ -132,5 +135,3 @@ export const handler = async () => {
     }
 
 }
-
-handler();
